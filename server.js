@@ -30,16 +30,13 @@ app.use(bodyParser.json());
 //AUTHENTICATE
 var ClientId = credentials.web.client_id
 var ClientSecret = credentials.web.client_secret
-var RedirectUrl = "http://d5c7bb4b.ngrok.io"//'https://youtubeapitest.herokuapp.com'
+var RedirectUrl = "http://bcb77490.ngrok.io"//'https://youtubeapitest.herokuapp.com'
 
 function getOAuthClient(){
     return new OAuth2(ClientId, ClientSecret, RedirectUrl)
 }
 
 const oauth2Client = getOAuthClient()
-
-//SET UP REDIRECT FROM GET AUTH TO CALLBACK NEXT!!
-//RESOURCE --> https://stackoverflow.com/questions/43930184/get-access-token-on-server-side-javascript-nodejs-using-google-authorization-c
 
 app.get('/auth', (req,res) =>{
     console.log("auth is running")
@@ -48,11 +45,11 @@ app.get('/auth', (req,res) =>{
 })
 
 function getAuthUrl(){
-    var scope = 'https://www.googleapis.com/auth/youtube.upload'
+    var scopes = ['https://www.googleapis.com/auth/youtube.upload','https://www.googleapis.com/auth/youtube','https://www.googleapis.com/auth/youtube.readonly']
     
     var url = oauth2Client.generateAuthUrl({
             access_type:'offline',
-            scope:scope,
+            scope:scopes,
             approval_prompt: 'force'
     })
 
@@ -64,64 +61,19 @@ app.post('/setCode', async (req,res) =>{
     var code = req.body.code
     var tokens = await getToken(code)
 
-    oauth2Client.setCredentials(tokens)
-
-    var output = await uploadVideo(oauth2Client)
-    
-    res.send("upload completed")
-})
-
-async function getToken(code){
-    console.log("generating token")
-    try{
-        var tokens = await oauth2Client.getToken(code)
-        return tokens
-    }catch(err){
-        return err
-    }
-}
-/*
-function uploadVideo(){
-    console.log("upload video had been called")
-    var youtube = Youtube({ 
-        video: {
-          part: 'status,snippet' 
-        }
-      })
-       
-      var params = {
-        resource: {
-          snippet: {
-            title: 'test video',
-            description: 'This is a test video uploaded via the YouTube API'
-          },
-          status: {
-            privacyStatus: 'public'
-          }
-        }
-      }
-    youtube.upload('./src/resources/piano.mp4', params, function(err,video){
-        if(err){return err}
-        else{
-            console.log("video is uploading")
-            console.log(video)
-        }
-        //console.log("video was uploaded with ID: " + video.id)
+    oauth2Client.setCredentials({
+        access_token:tokens.tokens.access_token
     })
-}
-*/
-async function uploadVideo(){
-    
-    console.log(oauth2Client)
-    
+
     const youtube = google.youtube({
         version:'v3',
         auth:oauth2Client
     })
 
-    const  fileSize = fs.statSync('./src/resources/piano2.mp4').size
+    /* this code will upload a specified video from the server to youtube
+    const fileSize = fs.statSync('./src/resources/piano2.mp4').size
     console.log("file size = " + fileSize)
-    const res = youtube.videos.insert({
+    const response = youtube.videos.insert({
         part: 'id,snippet,status',
         notifySubscribers: false,
         requestBody: {
@@ -143,9 +95,41 @@ async function uploadVideo(){
             console.log("upload complete")
             console.log(data)   
         }
-    })
-}
+    })*/
+    
+    res.send("upload completed")
+})
 
+app.get('/getVideos', (req,res) =>{
+    console.log("getting your youtube videos")
+
+    const youtube = google.youtube({
+        version:'v3',
+        auth:oauth2Client
+    })
+
+
+    youtube.videos.list({
+        part: 'snippet,status'
+    },(err, videos) =>{
+        if(!err){   
+            console.log(videos)
+        }
+        else{
+            console.log("Error ==> " + err)
+        }
+    })
+})
+
+async function getToken(code){
+    console.log("generating token")
+    try{
+        var tokens = await oauth2Client.getToken(code)
+        return tokens
+    }catch(err){
+        return err
+    }
+}
 
 app.get('/', (req,res) =>{
     res.send("running")

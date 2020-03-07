@@ -12,7 +12,7 @@ function App() {
   },[authCode])
 
   const setCode = () =>{
-    Axios.post('http://d5c7bb4b.ngrok.io/setCode',{
+    Axios.post('http://bcb77490.ngrok.io/setCode',{
       code:authCode
     })
     .then((res) =>{
@@ -20,6 +20,17 @@ function App() {
     })
     .catch((error) =>{
       console.log("ERROR --> " + error)
+    })
+  }
+
+  const getVideos = () =>{
+    console.log("getting your videos")
+    Axios.get('http://bcb77490.ngrok.io/getVideos')
+    .then((res) =>{
+      console.log(res)
+    })
+    .catch((err) =>{
+      console.log(err)
     })
   }
 
@@ -38,6 +49,7 @@ function App() {
     <div className="App">
       <p>Youtube test app with express server</p>
       <button onClick={() => setCode()}>Set Code</button>
+      <button onClick={() => getVideos()}>Get Videos</button>
     </div>
     
   );
