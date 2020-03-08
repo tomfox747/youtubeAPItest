@@ -12,7 +12,7 @@ function App() {
   },[authCode])
 
   const setCode = () =>{
-    Axios.post('http://bcb77490.ngrok.io/setCode',{
+    Axios.post('http://e7bf5398.ngrok.io/setCode',{
       code:authCode
     })
     .then((res) =>{
@@ -25,7 +25,7 @@ function App() {
 
   const getVideos = () =>{
     console.log("getting your videos")
-    Axios.get('http://bcb77490.ngrok.io/getVideos')
+    Axios.get('http://e7bf5398.ngrok.io/getVideos')
     .then((res) =>{
       console.log(res)
     })

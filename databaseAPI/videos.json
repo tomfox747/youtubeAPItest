@@ -1,0 +1,19 @@
+{
+    "users":[
+        {
+            "username":"tomfox747",
+            "videos":[
+                {
+                    "id":"1",
+                    "videoId":"1234",
+                    "title":"1234",
+                    "description":"qwerty",
+                    "uploadDate":"1234",
+                    "uploadTime":"1234",
+                    "author":"1234",
+                    "lightUps":"3"
+                }
+            ]
+        }
+    ]
+}
